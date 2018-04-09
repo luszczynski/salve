@@ -208,6 +208,16 @@ public class Quickstart {
 		Map<String, String> atividades = getAtividades(serviceSheet, spreadsheetId, rangeListaAtividades);
 		
 		String defaultAccountType = prop.getProperty("defaultAccountType", "GV");
+		final String defaultAccountTypeFinal;
+		
+		if (defaultAccountType == null || defaultAccountType.isEmpty()) {
+			System.out.println("Campo 'defaultAccountType' no config.properties deve ser preenchido!");
+			System.exit(1);
+		} else {
+			defaultAccountType = defaultAccountType.replaceAll("\"", "");
+		}
+		
+		defaultAccountTypeFinal = defaultAccountType;
 		
 		// Busca na planilha do Boris os tipos de clientes
 		// Nome da planilha e lista de colunas a serem buscadas.
@@ -253,63 +263,10 @@ public class Quickstart {
 
 		if (items.size() == 0) {
 			System.out.println("No upcoming events found.");
+			System.exit(0);
 		} else {
 			eventos = items.stream().filter(summaryNotNull().and(summaryContainsHash()))
-					.map(event -> createEvento(event, atividades, quarterWeek, defaultAccountType)).collect(Collectors.toList());
-
-			/*
-			 * items.stream().filter(it -> it.getSummary() != null &&
-			 * it.getSummary().contains("#")).forEach(event -> { Evento evento = new
-			 * Evento(); String summary = event.getSummary(); DateTime start =
-			 * event.getStart().getDateTime(); DateTime end = event.getEnd().getDateTime();
-			 * if (start == null) { start = event.getStart().getDate(); } if (end == null) {
-			 * end = event.getEnd().getDate(); }
-			 * 
-			 * // Preenche effort Date inicioTime = new Date(start.getValue()); Date fimTime
-			 * = new Date(end.getValue()); evento.setEffort(getDateDiff(inicioTime, fimTime,
-			 * TimeUnit.MINUTES) / 60.0);
-			 * 
-			 * // Preenche description, account type e customer
-			 * 
-			 * String description = event.getDescription();
-			 * 
-			 * if (summary.contains("[") || summary.contains("]")) {
-			 * evento.setDescription(StringUtils.substringAfter(summary, "]").trim());
-			 * 
-			 * String subSummary = StringUtils.substringBetween(summary, "[", "]");
-			 * 
-			 * if (subSummary.contains("-")) {
-			 * evento.setAccountType(StringUtils.substringBetween(summary, "-", "]"));
-			 * evento.setCustomer(StringUtils.substringBetween(summary, "[", "-")); } else {
-			 * evento.setAccountType("GV"); evento.setCustomer(subSummary); } } else {
-			 * evento.setDescription(StringUtils.substringAfter(summary, "#").trim()); }
-			 * 
-			 * // Preenche type
-			 * evento.setType(atividades.get(StringUtils.substringBefore(summary,
-			 * "#").toUpperCase()));
-			 * 
-			 * evento.setWeek(getWeek(inicioTime, quarterDia));
-			 * 
-			 * if (description != null) { if (description.toLowerCase().contains("#city:"))
-			 * { evento.setCity(StringUtils.substringBetween(description, "#city:",
-			 * "#").trim()); }
-			 * 
-			 * if (description.toLowerCase().contains("#partner:")) {
-			 * evento.setPartner(StringUtils.substringBetween(description, "#partner:",
-			 * "#").trim()); if (description.toLowerCase().contains("#presale"))
-			 * evento.setPreSalePartner("Y"); else evento.setPreSalePartner("N"); } }
-			 * 
-			 * eventos.add(evento); });
-			 */
-			// for (Event event : items) {
-			//
-			// String summary = event.getSummary();
-			//
-			// if(summary != null && summary.contains("#")) {
-			//
-			// }
-			//
-			// }
+					.map(event -> createEvento(event, atividades, quarterWeek, defaultAccountTypeFinal)).collect(Collectors.toList());
 		}
 
 		writeSheet(eventos, spreadsheetId, serviceSheet,
@@ -479,7 +436,6 @@ public class Quickstart {
 		String lastWeek = null;
 
 		if (values == null || values.size() == 0) {
-			System.out.println("No data found.");
 			return "Q1W01";
 		} else {
 			for (int i = 0; i < values.size(); i++) {
@@ -502,10 +458,21 @@ public class Quickstart {
 	private static Integer getNextAvaiableRow(Sheets serviceSheet, String spreadsheetId, String rangeWeek)
 			throws IOException {
 		ValueRange response;
+		Integer intReturn;
+	
 		// Executa a busca
 		response = serviceSheet.spreadsheets().values().get(spreadsheetId, rangeWeek).execute();
-
-		return response.getValues().size() + 2;
+		
+		List<List<Object>> values = response.getValues();
+		
+		if(values != null) {
+			intReturn = values.size() + 2;
+		}
+		else {
+			intReturn = 2;
+		}
+		
+		return intReturn;
 	}
 
 	private static String getWeek(Date current, Map<String, Date> quarterWeek) {
