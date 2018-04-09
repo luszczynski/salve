@@ -206,7 +206,9 @@ public class Quickstart {
 		// String rangeListaAtividades = "Listas!A:A";
 		String rangeListaAtividades = prop.getProperty("rangeListaAtividades", "Listas!A:A");
 		Map<String, String> atividades = getAtividades(serviceSheet, spreadsheetId, rangeListaAtividades);
-
+		
+		String defaultAccountType = prop.getProperty("defaultAccountType", "GV");
+		
 		// Busca na planilha do Boris os tipos de clientes
 		// Nome da planilha e lista de colunas a serem buscadas.
 		// String rangeTipoCliente = "Listas!J:J";
@@ -253,7 +255,7 @@ public class Quickstart {
 			System.out.println("No upcoming events found.");
 		} else {
 			eventos = items.stream().filter(summaryNotNull().and(summaryContainsHash()))
-					.map(event -> createEvento(event, atividades, quarterWeek)).collect(Collectors.toList());
+					.map(event -> createEvento(event, atividades, quarterWeek, defaultAccountType)).collect(Collectors.toList());
 
 			/*
 			 * items.stream().filter(it -> it.getSummary() != null &&
@@ -351,7 +353,7 @@ public class Quickstart {
 		return it -> it.getSummary().contains("#");
 	}
 
-	private static Evento createEvento(Event event, Map<String, String> atividades, Map<String, Date> quarterDia) {
+	private static Evento createEvento(Event event, Map<String, String> atividades, Map<String, Date> quarterDia, String defaultAccountType) {
 		Evento evento = new Evento();
 		String summary = event.getSummary();
 		DateTime start = event.getStart().getDateTime();
@@ -381,7 +383,7 @@ public class Quickstart {
 				evento.setAccountType(StringUtils.substringBetween(summary, "-", "]"));
 				evento.setCustomer(StringUtils.substringBetween(summary, "[", "-"));
 			} else {
-				evento.setAccountType("GV");
+				evento.setAccountType(defaultAccountType);
 				evento.setCustomer(subSummary);
 			}
 		} else {
