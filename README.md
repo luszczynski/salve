@@ -22,16 +22,21 @@ export SALVE_HOME=$HOME/apps/salve
 
 Crie a pasta $SALVE_HOME e copie o JAR
 ```
-mkdir $SALVE_HOME && cp target/salve-0.0.1-SNAPSHOT.jar $SALVE_HOME/salve.jar
+mkdir $SALVE_HOME && cp target/salve-0.0.1-SNAPSHOT-jar-with-dependencies.jar $SALVE_HOME/salve.jar
 ```
 
-Cria suas credencias do google para o calendar e para o sheet.
+Acesse a pasta recém criada:
+```
+cd $SALVE_HOME
+```
 
-* Para o google calendar, acesse https://developers.google.com/calendar/quickstart/java e execute o `step 1` salvando o arquivo json gerado na pasta $HOME/apps/salve/secret_calendar.json
+Cria suas credencias do google para o calendar e para o sheet e salve na pasta `$SALVE_HOME`.
+
+* Para o google calendar, acesse https://developers.google.com/calendar/quickstart/java e execute o `step 1` salvando o arquivo json gerado com o nome `secret_calendar.json` na pasta `$SALVE_HOME`
 
 ![step1-calendar](img/Selection_362.png "Step 1")
 
-* Para o google sheet, acesse https://developers.google.com/sheets/api/quickstart/java e execute o `step 1` salvando o arquivo json gerado na pasta $HOME/apps/salve/secret_sheet.json
+* Para o google sheet, acesse https://developers.google.com/sheets/api/quickstart/java e execute o `step 1` salvando o arquivo json gerado com nome `secret_sheet.json` na pasta `$SALVE_HOME`
 
 ![step1-sheet](img/Selection_363.png "Step 1")
 
@@ -76,7 +81,7 @@ defaultAccountType="GV"
 EOF
 ```
 
-Altere no `config.properties` o valor do campo `user` para o seu nome que aparece na aba da planilha do Boris.
+Altere no `config.properties` o valor do campo `user` para o seu nome que aparece na aba da planilha dos SAs.
 
 ![config](img/Selection_374.png "config")
 
